@@ -29,7 +29,7 @@ const users = {
     {
       id: "yat999",
       name: "Dee",
-      job: "Aspring actress"
+      job: "Aspiring actress"
     },
     {
       id: "zap555",
@@ -81,6 +81,45 @@ app.post("/users", (req, res) => {
   const userToAdd = req.body;
   addUser(userToAdd);
   res.send();
+});
+
+console.log("Server is running and listening on port", port);
+
+app.get("/users/search", (req, res) => {
+  console.log("Received request to /users/search");
+  const { name, job } = req.query;
+  console.log(`Searching with name: ${name} and job: ${job}`);
+
+  if (!name || !job) {
+    return res.status(400).send("Both name and job must be provided.");
+  }
+
+  const result = users["users_list"].filter((user) => {
+    const matchName = name ? user.name.toLowerCase() === name.toLowerCase() : true;
+    const matchJob = job ? user.job.toLowerCase() === job.toLowerCase() : true;
+    return matchName && matchJob;
+  });
+
+  console.log(`Search result:`, result);
+
+  if (result.length === 0) {
+    res.status(404).send("No users found.");
+  } else {
+    res.send(result);
+  }
+});
+
+
+app.delete("/users/:id", (req, res) => {
+  const id = req.params.id;
+  const index = users["users_list"].findIndex((user) => user.id === id);
+
+  if (index === -1) {
+    res.status(404).send("User not found.");
+  } else {
+    users["users_list"].splice(index, 1);
+    res.status(200).send("User deleted successfully.");
+  }
 });
 
 app.listen(port, () => {
