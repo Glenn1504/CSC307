@@ -88,20 +88,26 @@ app.get("/users/:id", (req, res) => {
   }
 });
 
+
+// Function to generate a random ID
+function generateRandomId() {
+  return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+}
+
 app.post("/users", (req, res) => {
 
   const userToAdd = req.body; 
 
-  // Generate a unique ID if it's not provided
-  userToAdd.id = userToAdd.id || Math.random().toString(36).substr(2, 9);
-
-  // Ensure the user has an ID, name, and job
+  // Ensure the user has a name and job, ID will be generated
   if (!userToAdd.name || !userToAdd.job) {
-    return res.status(400).send("Invalid user data. Please provide name, and job.");
+    return res.status(400).send("Invalid user data. Please provide name and job.");
   }
 
+  // Generate a random ID and assign it to the user
+  userToAdd.id = generateRandomId();
+
   const addedUser = addUser(userToAdd);
-  res.status(201).send(addedUser); // Send back the added user with 201 status
+  res.status(201).send(addedUser);
 });
 
 // Delete a user by ID
@@ -114,6 +120,7 @@ app.delete("/users/:id", (req, res) => {
     return res.status(404).send("Resource not found.");
   } else {
     users["users_list"].splice(userIndex, 1); // Remove the user from the list
+    console.log(`User with ID ${id} deleted`);
     return res.status(204).send(); // 204 No Content response
   }
 });

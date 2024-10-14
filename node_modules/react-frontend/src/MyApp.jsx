@@ -49,40 +49,63 @@ function MyApp() {
   }, []); // Empty dependency array ensures this runs once on mount	
 
   function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
-    });
-    setCharacters(updated);
+  const characterToDelete = characters[index];
+  
+  // Make sure we have an ID to delete the user by
+  if (!characterToDelete.id) {
+    console.error("No ID found for character");
+    return;
   }
 
+  fetch(`http://localhost:8000/users/${characterToDelete.id}`, {
+    method: "DELETE",
+  })
+    .then((res) => {
+      if (res.status === 204) {
+        console.log(`Deleted user with ID: ${characterToDelete.id}`);
+        // Only remove from the state after a successful backend deletion
+        const updatedCharacters = characters.filter((_, i) => i !== index);
+        setCharacters(updatedCharacters);
+      } else if (res.status === 404) {
+        console.error("User not found");
+      } else {
+        console.error("Failed to delete user");
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
   function postUser(person) {
-    const promise = fetch("http://localhost:8000/users", {
+    return fetch("http://localhost:8000/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(person),
     });
-
-    return promise;
   }
 
-  
-  function updateList(person) { 
-  postUser(person)
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error("Failed to add user");
-      }
-      return res.json(); // Get the new user object from the backend (with id)
-    })
-    .then((newUser) => {
-      setCharacters([...characters, newUser]); // Update state with the new user from the backend
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  function updateList(person) {
+    postUser(person)
+      .then((res) => {
+        // Ensure the response has a status of 201
+        if (res.status === 201) {
+          return res.json(); // Parse the JSON from the response
+        } else {
+          throw new Error("Failed to create user");
+        }
+      })
+      .then((newUser) => {
+        // Update the state with the newly created user that includes the ID
+        setCharacters([...characters, newUser]);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
+
 	
   return (
   <div className="container">
