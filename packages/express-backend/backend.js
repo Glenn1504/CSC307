@@ -1,7 +1,10 @@
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
+
+app.use(cors());
 
 app.use(express.json());
 
@@ -89,9 +92,12 @@ app.post("/users", (req, res) => {
 
   const userToAdd = req.body; 
 
+  // Generate a unique ID if it's not provided
+  userToAdd.id = userToAdd.id || Math.random().toString(36).substr(2, 9);
+
   // Ensure the user has an ID, name, and job
-  if (!userToAdd.id || !userToAdd.name || !userToAdd.job) {
-    return res.status(400).send("Invalid user data. Please provide id, name, and job.");
+  if (!userToAdd.name || !userToAdd.job) {
+    return res.status(400).send("Invalid user data. Please provide name, and job.");
   }
 
   const addedUser = addUser(userToAdd);

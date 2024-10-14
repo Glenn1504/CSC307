@@ -22,7 +22,7 @@ function Form(props) {
   // Submit form data
   function submitForm(event) {
     event.preventDefault(); // Prevent default form submission
-    props.handleSubmit(person); // Call the parent's handleSubmit
+    props.updateList(person); // Call the parent's handleSubmit
     setPerson({ name: "", job: "" }); // Reset form after submission
   }
 
