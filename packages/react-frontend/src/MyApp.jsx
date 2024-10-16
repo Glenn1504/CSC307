@@ -3,25 +3,6 @@ import React, { useState, useEffect } from "react";
 import Table from "./Table";
 import Form from "./Form";
 
-const characters = [
-  {
-    name: "Charlie",
-    job: "Janitor"
-  },
-  {
-    name: "Mac",
-    job: "Bouncer"
-  },
-  {
-    name: "Dee",
-    job: "Aspring actress"
-  },
-  {
-    name: "Dennis",
-    job: "Bartender"
-  }
-];
-
 function MyApp() {
   const [characters, setCharacters] = useState([]);
 
@@ -52,12 +33,12 @@ function MyApp() {
   const characterToDelete = characters[index];
   
   // Make sure we have an ID to delete the user by
-  if (!characterToDelete.id) {
+  if (!characterToDelete._id) { // Change 'id' to '_id'
     console.error("No ID found for character");
     return;
   }
 
-  fetch(`http://localhost:8000/users/${characterToDelete.id}`, {
+  fetch(`http://localhost:8000/users/${characterToDelete._id}`, {
     method: "DELETE",
   })
     .then((res) => {
